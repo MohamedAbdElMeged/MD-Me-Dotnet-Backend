@@ -1,4 +1,6 @@
 using Backend.Dtos.Requests;
+using Backend.Extensions;
+using Backend.Results;
 using Backend.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
@@ -21,16 +23,23 @@ namespace Backend.Controllers
         
         
         [HttpPost("register")]
-        public async Task<ActionResult> Register([FromBody] RegisterRequestDto registerRequestDto)
+        public async Task<IActionResult> Register([FromBody] RegisterRequestDto registerRequestDto)
         {
-            await _registerValidator.ValidateAndThrowAsync(registerRequestDto);
-
-            var user = await _authService.RegisterAsync(registerRequestDto);
-            if (user is null)
+            var validationResult = await _registerValidator.ValidateAsync(registerRequestDto);
+            if (!validationResult.IsValid)
             {
-                return BadRequest("User can not be created");
+                var message = string.Join(" | ", validationResult.Errors.Select(e => e.ErrorMessage));
+                var validationFailure = Result<Backend.Dtos.Responses.UserResponse>.Failure(new Error(
+                    ErrorType.Validation,
+                    message,
+                    "VALIDATION_ERROR"
+                ));
+
+                return validationFailure.ToActionResult(this);
             }
-            return Ok(new{email = registerRequestDto.Email});
+            
+            var result = await _authService.RegisterAsync(registerRequestDto);
+            return result.ToActionResult(this);
         }
     }
 }

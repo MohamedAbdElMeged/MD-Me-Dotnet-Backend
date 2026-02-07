@@ -23,12 +23,11 @@ namespace Backend.Controllers
         [HttpPost("register")]
         public async Task<ActionResult> Register([FromBody] RegisterRequestDto registerRequestDto)
         {
-            await _registerValidator.ValidateAndThrowAsync(registerRequestDto);
-
-            var user = await _authService.RegisterAsync(registerRequestDto);
-            if (user is null)
+            
+            var result = await _authService.RegisterAsync(registerRequestDto);
+            if (result.IsFailure)
             {
-                return BadRequest("User can not be created");
+                return BadRequest(result.Error);
             }
             return Ok(new{email = registerRequestDto.Email});
         }

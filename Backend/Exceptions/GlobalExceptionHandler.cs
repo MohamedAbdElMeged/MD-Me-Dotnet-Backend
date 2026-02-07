@@ -10,7 +10,7 @@ public class GlobalExceptionHandler(IProblemDetailsService problemDetailsService
         CancellationToken cancellationToken)
     {
         
-        httpContext.Response.StatusCode = StatusCodes.Status303SeeOther;
+        // httpContext.Response.StatusCode = StatusCodes.Status303SeeOther;
         return false;
     }
 }

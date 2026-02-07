@@ -23,7 +23,11 @@ namespace Backend.Controllers
         [HttpPost("register")]
         public async Task<ActionResult> Register([FromBody] RegisterRequestDto registerRequestDto)
         {
-            await _registerValidator.ValidateAndThrowAsync(registerRequestDto);
+            // await _registerValidator.ValidateAndThrowAsync(registerRequestDto);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
 
             var user = await _authService.RegisterAsync(registerRequestDto);
             if (user is null)

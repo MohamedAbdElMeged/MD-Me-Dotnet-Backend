@@ -20,6 +20,7 @@ public static class ResultExtensions
     public static IActionResult ToActionResult<T>(this Result<T> result, ControllerBase controller)
     {
         if (result.IsSuccess)
+            // return controller.Ok(new { status =  "Success", data = result.Value});
             return controller.Ok(result.Value);
 
         return controller.Problem(

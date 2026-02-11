@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers;
 
-
+// legacy- should be deleted
 [ApiController]
 [Route("api/[controller]")]
 public class FilesController : ControllerBase
@@ -48,6 +48,7 @@ public class FilesController : ControllerBase
     [HttpGet("list-buckets")]
     public async Task<IActionResult> ListBuckets()
     {
+        
         var data = await _s3Client.ListBucketsAsync();
         var buckets = data.Buckets.Select(b => { return b.BucketName; });
         return Ok(buckets);

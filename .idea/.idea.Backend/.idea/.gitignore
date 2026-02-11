@@ -13,3 +13,9 @@
 /dataSources.local.xml
 # Editor-based HTTP Client requests
 /httpRequests/
+
+/bin
+/obj
+/obj/Debug/*
+/obj/Release/*
+/appsettings.Development.json

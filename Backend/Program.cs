@@ -1,4 +1,6 @@
 using System.Text;
+using Amazon.Runtime;
+using Amazon.S3;
 using Backend.Data;
 using Backend.Exceptions;
 using Backend.Services;
@@ -25,9 +27,20 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddExceptionHandler<DatabaseExceptionHandler>();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly, includeInternalTypes: true);
+
+builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
+builder.Services.AddAWSService<IAmazonS3>(new Amazon.Extensions.NETCore.Setup.AWSOptions
+{
+    Credentials = new BasicAWSCredentials(
+        builder.Configuration["AWS:Credentials:AccessKey"],
+        builder.Configuration["AWS:Credentials:SecretKey"]
+    ),
+    Region = Amazon.RegionEndpoint.USWest1
+});
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));

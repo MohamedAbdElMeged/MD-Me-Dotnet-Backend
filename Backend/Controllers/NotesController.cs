@@ -16,7 +16,7 @@ namespace Backend.Controllers
     {
         [Authorize]
         [HttpPost("")]
-        [RequestSizeLimit(10 * 1024 * 1024)]
+        
         public async Task<IActionResult> CreateNote(CreateNoteRequestDto createNoteRequestDto)
         {
             var validationResult = await createValidator.ValidateAsync(createNoteRequestDto);
@@ -33,5 +33,15 @@ namespace Backend.Controllers
             var result = await noteService.CreateNoteAsync(createNoteRequestDto);
             return result.ToActionResult(this);
         }
+
+        [Authorize]
+        [HttpPost("{id}/upload-note")]
+        public async Task<IActionResult> UploadNote([FromQuery] Guid id)
+        {
+            var result = await noteService.CreatePresignedUrlForNoteAsync(id);
+            
+            return result.ToActionResult(this);
+        }
+        
     }
 }

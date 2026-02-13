@@ -5,5 +5,4 @@ public class CreateNoteRequestDto
     public Guid VaultId { get; set; }
     public string Path { get; set; }
     public string Title { get; set; }
-    public string Content { get; set; }
 }

@@ -12,6 +12,7 @@ public static class VaultMapper
         {
             Id = vault.Id,
             Name = vault.Name
+            
         };
     }
 
@@ -21,6 +22,16 @@ public static class VaultMapper
         {
             Id = updateVaultDto.Id,
             Name = updateVaultDto.Name
+        };
+    }
+
+    public static VaultWithNoteResponseDto ToVaultWithNoteResponseDto(this Vault vault)
+    {
+        return new VaultWithNoteResponseDto()
+        {
+            Id = vault.Id,
+            Name = vault.Name,
+            Notes = new List<NoteResponseDto>(vault.Notes.Select(n => n.ToNoteResponseDto()))
         };
     }
 }

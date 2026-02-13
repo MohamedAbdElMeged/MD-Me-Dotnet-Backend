@@ -62,6 +62,14 @@ public class VaultsController(ICurrentUserService currentUser, IVaultService vau
         var result = await vaultService.UpdateVaultAsync(id, updateVaultDto);
         return result.ToActionResult(this);
     }
+
+    [Authorize]
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetVault([FromQuery] Guid id)
+    {
+        var result = await vaultService.GetVaultAsync(id);
+        return result.ToActionResult(this);
+    }
     
 }
 

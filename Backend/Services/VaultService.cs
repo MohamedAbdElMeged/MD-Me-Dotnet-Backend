@@ -12,11 +12,11 @@ namespace Backend.Services;
 public class VaultService(AppDbContext context, ICurrentUserService currentUser) : IVaultService
 {
     // To-Do add pagination
-    public async Task<Result<List<VaultResponseDto>>> GetUserVaults(Guid userId)
+    public async Task<Result<List<VaultWithNoteResponseDto>>> GetUserVaults(Guid userId)
     {
         var vaults = await context.Vaults.Where(v => v.UserId == userId).ToListAsync();
-        var vaultsResponse = vaults.Select(v => v.ToVaultResponseDto()).ToList();
-        return Result<List<VaultResponseDto>>.Success(vaultsResponse);
+        var vaultsResponse = vaults.Select(v => v.ToVaultWithNoteResponseDto()).ToList();
+        return Result<List<VaultWithNoteResponseDto>>.Success(vaultsResponse);
     }
 
     public async Task<Result<VaultResponseDto>> CreateVaultAsync(CreateVaultRequestDto createVaultRequestDto)
@@ -55,9 +55,14 @@ public class VaultService(AppDbContext context, ICurrentUserService currentUser)
 
     }
 
-    public async Task<Vault?> GetVaultByIdAsync(Guid id)
+    public async Task<Vault?> GetVaultByIdAsync(Guid id, bool withNotes = false)
     {
         return await context.Vaults.FirstOrDefaultAsync(v => v.Id == id);
     }
-    
+
+    public async Task<Result<VaultWithNoteResponseDto>> GetVaultAsync(Guid id)
+    {
+        var vault = await GetVaultByIdAsync(id,true);
+        return vault is null ? Result<VaultWithNoteResponseDto>.Failure(CommonErrors.NotFoundError("vault")) : Result<VaultWithNoteResponseDto>.Success(vault.ToVaultWithNoteResponseDto());
+    }
 }

@@ -11,14 +11,8 @@ namespace Backend.Controllers;
 // legacy- should be deleted
 [ApiController]
 [Route("api/[controller]")]
-public class FilesController : ControllerBase
+public class FilesController(IAmazonS3 s3Client) : ControllerBase
 {
-    private readonly IAmazonS3 _s3Client;
-
-    public FilesController(IAmazonS3 s3Client)
-    {
-        _s3Client = s3Client;
-    }
     // encrypt the file content only 
     [HttpPost("files")]
     public async Task<IActionResult> UploadFile([FromBody] FileRequestDto fileRequestDto, IWebHostEnvironment env)
@@ -41,7 +35,7 @@ public class FilesController : ControllerBase
         putObjectRequest.ContentType = "text/markdown";
         putObjectRequest.Key = fileRequestDto.FileName;
         // putObjectRequest.FilePath = $"/FirstUploads/{fileRequestDto.FileName}";
-        await _s3Client.PutObjectAsync(putObjectRequest);
+        await s3Client.PutObjectAsync(putObjectRequest);
         return Ok(fileRequestDto);
     }
 
@@ -49,7 +43,7 @@ public class FilesController : ControllerBase
     public async Task<IActionResult> ListBuckets()
     {
         
-        var data = await _s3Client.ListBucketsAsync();
+        var data = await s3Client.ListBucketsAsync();
         var buckets = data.Buckets.Select(b => { return b.BucketName; });
         return Ok(buckets);
     }

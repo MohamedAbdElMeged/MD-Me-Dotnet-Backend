@@ -16,7 +16,7 @@ public class NoteService(AppDbContext context, ICurrentUserService currentUser,
    
     public async Task<Result<NoteResponseDto>> CreateNoteAsync(CreateNoteRequestDto createNoteRequestDto)
     {
-        var vault = await vaultService.GetVaultByIdAsync(createNoteRequestDto.VaultId);
+        var vault = await vaultService.GetVaultByIdAsync(createNoteRequestDto.VaultId, false);
         if (vault == null || vault.UserId != currentUser.UserId)
         {
             return Result<NoteResponseDto>.Failure(CommonErrors.NotFoundError("vault"));
@@ -85,7 +85,7 @@ public class NoteService(AppDbContext context, ICurrentUserService currentUser,
             title = title[..^3]; 
         }
     
-        var normalizedKeyResult = NormalizeKey($"{vaultName}/{path}/{title}.md");
+        var normalizedKeyResult = NormalizeKey($"{currentUser.UserId}/{vaultName}/{path}/{title}.md");
         return normalizedKeyResult;
     }
 

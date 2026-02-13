@@ -23,6 +23,18 @@ public static class NoteNapper
             Id = note.Id,
             Path = note.Path,
             Title = note.Title,
+            VaultId = note.VaultId
+        };
+    }
+
+    public static NoteWithVaultDto ToNoteWithVaultDto(this Note note)
+    {
+        return new NoteWithVaultDto()
+        {
+            Id = note.Id,
+            Path = note.Path,
+            Title = note.Title,
+            VaultId = note.VaultId,
             Vault = note.Vault.ToVaultResponseDto()
         };
     }

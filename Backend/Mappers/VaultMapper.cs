@@ -1,3 +1,4 @@
+using Backend.Dtos.Requests;
 using Backend.Dtos.Responses;
 using Backend.Entities;
 
@@ -11,6 +12,15 @@ public static class VaultMapper
         {
             Id = vault.Id,
             Name = vault.Name
+        };
+    }
+
+    public static Vault ToVaultEntityFromUpdateVaultRequestDto(this UpdateVaultDto updateVaultDto)
+    {
+        return new Vault()
+        {
+            Id = updateVaultDto.Id,
+            Name = updateVaultDto.Name
         };
     }
 }

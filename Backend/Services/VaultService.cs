@@ -1,3 +1,4 @@
+using System;
 using Backend.Data;
 using Backend.Dtos.Requests;
 using Backend.Dtos.Responses;
@@ -14,13 +15,8 @@ public class VaultService(AppDbContext context, ICurrentUserService currentUser)
     public async Task<Result<List<VaultResponseDto>>> GetUserVaults(Guid userId)
     {
         var vaults = await context.Vaults.Where(v => v.UserId == userId).ToListAsync();
-        List<VaultResponseDto> vaultsResponse = new List<VaultResponseDto>();
-        if (vaults.Count != 0)
-        {
-            vaultsResponse = vaults.Select(v => v.ToVaultResponseDto()).ToList();
-        }
-        
-        return  Result<List<VaultResponseDto>>.Success(vaultsResponse);
+        var vaultsResponse = vaults.Select(v => v.ToVaultResponseDto()).ToList();
+        return Result<List<VaultResponseDto>>.Success(vaultsResponse);
     }
 
     public async Task<Result<VaultResponseDto>> CreateVaultAsync(CreateVaultRequestDto createVaultRequestDto)
@@ -34,4 +30,34 @@ public class VaultService(AppDbContext context, ICurrentUserService currentUser)
         await context.SaveChangesAsync();
         return Result<VaultResponseDto>.Success(vault.ToVaultResponseDto());
     }
+
+    public async Task<Result> DeleteAsync(Guid id)
+    {
+        var vault = await GetVaultByIdAsync(id);
+        if (vault is null)
+            return new Result(false, CommonErrors.NotFoundError("vault"));
+
+        context.Vaults.Remove(vault);
+        await context.SaveChangesAsync();
+        return new Result(true, null);
+    }
+
+    public async Task<Result<VaultResponseDto>> UpdateVaultAsync(Guid id, UpdateVaultDto updateVaultDto)
+    {
+        var vault = await GetVaultByIdAsync(id);
+        if (vault is null)
+            return Result<VaultResponseDto>.Failure(CommonErrors.NotFoundError("vault"));
+        updateVaultDto.Id = id;
+        vault = updateVaultDto.ToVaultEntityFromUpdateVaultRequestDto();
+        context.Vaults.Update(vault);
+        await context.SaveChangesAsync();
+        return Result<VaultResponseDto>.Success(vault.ToVaultResponseDto());
+
+    }
+
+    public async Task<Vault?> GetVaultByIdAsync(Guid id)
+    {
+        return await context.Vaults.FirstOrDefaultAsync(v => v.Id == id);
+    }
+    
 }

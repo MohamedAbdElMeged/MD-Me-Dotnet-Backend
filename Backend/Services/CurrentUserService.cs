@@ -1,21 +1,18 @@
 using System.Security.Claims;
+using Backend.Data;
+using Backend.Entities;
 
 namespace Backend.Services;
 
-public class CurrentUserService : ICurrentUserService
+public class CurrentUserService(IHttpContextAccessor httpContextAccessor, AppDbContext dbContext) : ICurrentUserService
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public CurrentUserService(IHttpContextAccessor httpContextAccessor)
-    {
-        _httpContextAccessor = httpContextAccessor;
-    }
 
     public Guid UserId
     {
         get
         {
-            var userId = _httpContextAccessor.HttpContext?
+            var userId = httpContextAccessor.HttpContext?
                 .User?
                 .FindFirst(ClaimTypes.NameIdentifier)?
                 .Value;
@@ -24,8 +21,11 @@ public class CurrentUserService : ICurrentUserService
         }
     }
     public string? Email =>
-        _httpContextAccessor.HttpContext?
+        httpContextAccessor.HttpContext?
             .User?
             .FindFirst(ClaimTypes.Email)?
             .Value;
+
+    public User? User =>
+        dbContext.Users.FirstOrDefault(u => u.Id == UserId);
 }

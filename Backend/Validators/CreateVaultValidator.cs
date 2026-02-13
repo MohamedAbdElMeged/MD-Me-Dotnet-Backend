@@ -18,7 +18,7 @@ public class CreateVaultValidator : AbstractValidator<CreateVaultRequestDto>
         RuleFor(x => x.Name).NotEmpty().WithMessage("Vault Name is Required");
         RuleFor(x => x.Name)
             .MustAsync(async (name, _) =>
-                !await _context.Vaults.AnyAsync(x => x.Name == name && x.UserId == currentUser.UserId )
+                !await _context.Vaults.AnyAsync(x => x.Name == name && x.UserId == _currentUser.UserId )
             ).WithMessage("Vault Name must be unique per user");
     }
 }

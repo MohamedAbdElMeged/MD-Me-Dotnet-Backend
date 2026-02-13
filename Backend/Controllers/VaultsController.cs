@@ -1,10 +1,10 @@
-using System.Security.Claims;
+
 using Backend.Dtos.Requests;
 using Backend.Dtos.Responses;
 using Backend.Extensions;
 using Backend.Results;
 using Backend.Services;
-using Backend.Validators;
+
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,14 +27,14 @@ public class VaultsController(ICurrentUserService currentUser, IVaultService vau
 
 
     [Authorize]
-    [HttpPost("create-vault")]
+    [HttpPost("")]
     public async Task<IActionResult> CreateVault([FromBody] CreateVaultRequestDto createVaultRequestDto)
     {
         var validationResult = await validator.ValidateAsync(createVaultRequestDto);
         if (!validationResult.IsValid)
         {
             var message = string.Join(" | ", validationResult.Errors.Select(e => e.ErrorMessage));
-            var validationFailure = Result<Backend.Dtos.Responses.VaultResponseDto>.Failure(new Error(
+            var validationFailure = Result<VaultResponseDto>.Failure(new Error(
                 Code: "VALIDATION_ERROR",
                 ErrorType: ErrorType.Validation,
                 Message: message
@@ -46,7 +46,22 @@ public class VaultsController(ICurrentUserService currentUser, IVaultService vau
         return result.ToActionResult(this);
 
     }
+
+    [Authorize]
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteVault([FromQuery] Guid id)
+    {
+        var result = await vaultService.DeleteAsync(id);
+        return result.ToActionResult(this);
+    }
     
+    [Authorize]
+    [HttpPatch("{id}")]
+    public async Task<IActionResult> UpdateVault([FromQuery] Guid id, [FromBody] UpdateVaultDto updateVaultDto )
+    {
+        var result = await vaultService.UpdateVaultAsync(id, updateVaultDto);
+        return result.ToActionResult(this);
+    }
     
 }
 

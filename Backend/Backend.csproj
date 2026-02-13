@@ -9,6 +9,7 @@
     <ItemGroup>
         <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.3.22" />
         <PackageReference Include="AWSSDK.S3" Version="4.0.18.3" />
+        <PackageReference Include="FluentValidation" Version="12.1.1" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.2" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2"/>
@@ -21,10 +22,6 @@
         <PackageReference Include="Scalar.AspNetCore" Version="2.12.20" />
         <PackageReference Include="StackExchange.Redis" Version="2.10.1" />
         <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.15.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="uploads\" />
     </ItemGroup>
 
 </Project>

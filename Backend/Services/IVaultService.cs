@@ -13,4 +13,5 @@ public interface IVaultService
     Task<Result<VaultResponseDto>> UpdateVaultAsync(Guid id, UpdateVaultDto updateVaultDto);
     public Task<Vault?> GetVaultByIdAsync(Guid id,bool withNotes = false);
     Task<Result<VaultWithNoteResponseDto>> GetVaultAsync(Guid id);
+    Task<Result<VaultNotesTreeResponseDto>> GetVaultNotesTreeAsync(Guid vaultId, string? path, bool recursive, int page, int pageSize);
 }

@@ -70,6 +70,22 @@ public class VaultsController(ICurrentUserService currentUser, IVaultService vau
         var result = await vaultService.GetVaultAsync(id);
         return result.ToActionResult(this);
     }
+
+    [Authorize]
+    [HttpGet("{id}/notes")]
+    public async Task<IActionResult> GetVaultNotes(
+        [FromRoute] Guid id,
+        [FromQuery] string? path,
+        [FromQuery] bool recursive = false,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 50)
+    {
+        if (page < 1) page = 1;
+        if (pageSize < 1) pageSize = 1;
+        if (pageSize > 200) pageSize = 200;
+
+        var result = await vaultService.GetVaultNotesTreeAsync(id, path, recursive, page, pageSize);
+        return result.ToActionResult(this);
+    }
     
 }
-

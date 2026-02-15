@@ -2,8 +2,10 @@ namespace Backend.Services;
 
 public interface IAwsService
 {   
-    //generate presigned put url
-    // generate presigned get url
 
-    public Task<string> GenerateUploadPresignedUrl(string key);
+
+    public Task<string> GenerateUploadPresignedUrl(string key, bool upload);
+
+    public Task<bool> DeleteObject(string key);
+
 }

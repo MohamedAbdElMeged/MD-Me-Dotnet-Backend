@@ -42,13 +42,13 @@ public class NoteService(AppDbContext context, ICurrentUserService currentUser,
         return  Result<NoteResponseDto>.Success(note.ToNoteResponseDto());
     }
 
-    public async Task<Result<UploadNoteResponseDto>> CreatePresignedUrlForNoteAsync(Guid id)
+    public async Task<Result<UploadNoteResponseDto>> CreatePresignedUrlForNoteAsync(Guid id, bool upload)
     {
         var note = await GetNoteByIdASync(id);
-        if (note == null)
+        if (note == null || note.Vault.UserId != currentUser.UserId)
             return  Result<UploadNoteResponseDto>.Failure(CommonErrors.NotFoundError("note"));
-
-        var presignedUrl = await  awsService.GenerateUploadPresignedUrl(note.Path);
+        
+        var presignedUrl = await  awsService.GenerateUploadPresignedUrl(note.Path, upload);
         var response = new UploadNoteResponseDto()
         {
             id = id,
@@ -60,7 +60,20 @@ public class NoteService(AppDbContext context, ICurrentUserService currentUser,
 
     public async Task<Note> GetNoteByIdASync(Guid id)
     {
-        return await context.Notes.FirstOrDefaultAsync(n => n.Id == id);
+        return await context.Notes.Include(v=> v.Vault)
+            .ThenInclude( p=> p.User).FirstOrDefaultAsync(n => n.Id == id && n.Vault.UserId == currentUser.UserId);
+    }
+
+    public async Task<Result> DeleteNoteAsync(Guid id)
+    {
+        var note = await GetNoteByIdASync(id);
+        if (note is null)
+            return  Result<UploadNoteResponseDto>.Failure(CommonErrors.NotFoundError("note"));
+
+        await awsService.DeleteObject(note.Path);
+        context.Notes.Remove(note);
+        await context.SaveChangesAsync();
+        return new Result(true, null);
     }
 
 

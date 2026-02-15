@@ -35,15 +35,28 @@ namespace Backend.Controllers
 
         [Authorize]
         [HttpPost("{id}/upload-note")]
-        public async Task<IActionResult> UploadNote([FromQuery] Guid id)
+        public async Task<IActionResult> UploadNote([FromRoute] Guid id)
         {
-            var result = await noteService.CreatePresignedUrlForNoteAsync(id);
+            var result = await noteService.CreatePresignedUrlForNoteAsync(id, true);
             
             return result.ToActionResult(this);
         }
-        
-        
-        
-       
+
+        [HttpPost("{id}/download-note")]
+        [Authorize]
+        public async Task<IActionResult> DownloadNote([FromRoute] Guid id)
+        {
+            var result = await noteService.CreatePresignedUrlForNoteAsync(id, false);
+            
+            return result.ToActionResult(this);
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteNote([FromRoute] Guid id)
+        {
+            var result = await noteService.DeleteNoteAsync(id);
+            return result.ToActionResult(this);
+        }
     }
 }

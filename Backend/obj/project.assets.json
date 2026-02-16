@@ -6582,6 +6582,7 @@
     "net10.0": [
       "AWSSDK.Extensions.NETCore.Setup >= 4.0.3.22",
       "AWSSDK.S3 >= 4.0.18.3",
+      "FluentValidation >= 12.1.1",
       "FluentValidation.DependencyInjectionExtensions >= 12.1.1",
       "Microsoft.AspNetCore.Authentication.JwtBearer >= 10.0.2",
       "Microsoft.AspNetCore.OpenApi >= 10.0.2",
@@ -6644,6 +6645,10 @@
           "AWSSDK.S3": {
             "target": "Package",
             "version": "[4.0.18.3, )"
+          },
+          "FluentValidation": {
+            "target": "Package",
+            "version": "[12.1.1, )"
           },
           "FluentValidation.DependencyInjectionExtensions": {
             "target": "Package",

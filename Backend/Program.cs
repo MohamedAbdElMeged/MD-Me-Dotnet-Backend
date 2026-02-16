@@ -18,7 +18,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowSpecificOrigin",
         policy =>
         {
-            policy.WithOrigins("http://localhost:3000") 
+            policy.WithOrigins("http://localhost:5173") 
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
@@ -39,14 +39,18 @@ builder.Services.AddAWSService<IAmazonS3>(new Amazon.Extensions.NETCore.Setup.AW
         builder.Configuration["AWS:Credentials:AccessKey"],
         builder.Configuration["AWS:Credentials:SecretKey"]
     ),
-    Region = Amazon.RegionEndpoint.USWest1
+    Region = Amazon.RegionEndpoint.GetBySystemName(builder.Configuration["Aws:Region"])
 });
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
-
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddScoped<IVaultService, VaultService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<INoteService, NoteService>();
+builder.Services.AddScoped<IAwsService, AwsService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {

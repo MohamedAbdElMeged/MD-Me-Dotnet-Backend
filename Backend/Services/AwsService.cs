@@ -87,6 +87,13 @@ public class AwsService(IAmazonS3 s3, IConfiguration configuration) : IAwsServic
     private static string NormalizeKey(string key)
     {
         var normalized = key.Trim().Replace('\\', '/');
+        
+        
+        while (normalized.Contains("//"))
+        {
+            normalized = normalized.Replace("//", "/");
+        }
+        
         while (normalized.StartsWith('/'))
             normalized = normalized.Substring(1);
 

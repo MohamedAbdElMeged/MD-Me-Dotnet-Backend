@@ -17,7 +17,6 @@ public class CreateNoteValidator : AbstractValidator<CreateNoteRequestDto>
         _currentUser = currentUser;
         RuleFor(x => x.VaultId).NotEmpty().WithMessage("Vault Id is Required");
         RuleFor(x => x.Title).NotEmpty().WithMessage("Title is Required");
-        RuleFor(x => x.Path).NotEmpty().WithMessage("Path is Required");
         RuleFor(x => x.Path)
             .MustAsync(async (path, _) => !path.Contains("../")).WithMessage("Path cannot contain ../");
     }

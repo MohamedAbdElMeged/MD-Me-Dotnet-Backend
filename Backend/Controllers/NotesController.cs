@@ -51,11 +51,20 @@ namespace Backend.Controllers
             return result.ToActionResult(this);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:guid}")]
         [Authorize]
         public async Task<IActionResult> DeleteNote([FromRoute] Guid id)
         {
             var result = await noteService.DeleteNoteAsync(id);
+            return result.ToActionResult(this);
+        }
+
+        [HttpDelete("delete-notes")]
+        [Authorize]
+        public async Task<IActionResult> DeleteMultipleNotes(
+            [FromBody] DeleteMultipleNotesRequestDto deleteMultipleNotesRequestDto)
+        {
+            var result = await noteService.DeleteMultipleNotesAsync(deleteMultipleNotesRequestDto);
             return result.ToActionResult(this);
         }
     }

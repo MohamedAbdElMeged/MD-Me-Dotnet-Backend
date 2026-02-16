@@ -11,4 +11,5 @@ public interface INoteService
     public Task<Result<UploadNoteResponseDto>> CreatePresignedUrlForNoteAsync(Guid id, bool upload);
     public Task<Note?> GetNoteByIdASync(Guid id);
     Task<Result> DeleteNoteAsync(Guid id);
+    Task<Result<DeleteMultipleNotesResponse>> DeleteMultipleNotesAsync(DeleteMultipleNotesRequestDto deleteMultipleNotesRequestDto);
 }

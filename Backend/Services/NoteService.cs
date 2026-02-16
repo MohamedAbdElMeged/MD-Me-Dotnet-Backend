@@ -68,12 +68,44 @@ public class NoteService(AppDbContext context, ICurrentUserService currentUser,
     {
         var note = await GetNoteByIdASync(id);
         if (note is null)
-            return  Result<UploadNoteResponseDto>.Failure(CommonErrors.NotFoundError("note"));
+            return  Result<NoteResponseDto>.Failure(CommonErrors.NotFoundError("note"));
 
         await awsService.DeleteObject(note.Path);
         context.Notes.Remove(note);
         await context.SaveChangesAsync();
         return new Result(true, null);
+    }
+
+    public async Task<Result<DeleteMultipleNotesResponse>> DeleteMultipleNotesAsync(DeleteMultipleNotesRequestDto deleteMultipleNotesRequestDto)
+    {
+        var result = new DeleteMultipleNotesResponse()
+        {
+            Deleted = [],
+            Failed = []
+        };
+        foreach (var noteId in deleteMultipleNotesRequestDto.Ids)
+        {
+            var note = await GetNoteByIdASync(noteId);
+            if (note is null)
+            {
+                result.Failed.Add(noteId);
+                continue;
+            }
+            try
+            {
+                await awsService.DeleteObject(note.Path);
+                context.Notes.Remove(note);
+                await context.SaveChangesAsync();
+                result.Deleted.Add(noteId);
+            }
+            catch (Exception e)
+            {
+                result.Failed.Add(noteId);
+            }
+        }
+
+        return Result<DeleteMultipleNotesResponse>.Success(result);
+
     }
 
 
@@ -97,8 +129,12 @@ public class NoteService(AppDbContext context, ICurrentUserService currentUser,
         {
             title = title[..^3]; 
         }
-    
-        var normalizedKeyResult = NormalizeKey($"{currentUser.UserId}/{vaultName}/{path}/{title}.md");
+        
+        var keyPart = string.IsNullOrEmpty(path) 
+            ? $"{currentUser.UserId}/{vaultName}/{title}.md"
+            : $"{currentUser.UserId}/{vaultName}/{path}/{title}.md";
+            
+        var normalizedKeyResult = NormalizeKey(keyPart);
         return normalizedKeyResult;
     }
 
@@ -115,6 +151,13 @@ public class NoteService(AppDbContext context, ICurrentUserService currentUser,
         }
 
         var normalized = key.Trim().Replace('\\', '/');
+        
+        // Replace multiple consecutive slashes with single slash
+        while (normalized.Contains("//"))
+        {
+            normalized = normalized.Replace("//", "/");
+        }
+        
         while (normalized.StartsWith('/'))
         {
             normalized = normalized.Substring(1);
